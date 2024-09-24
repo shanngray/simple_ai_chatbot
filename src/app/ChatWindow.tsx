@@ -28,7 +28,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ messages }) => {
                             className="rounded-full mr-2"
                         />
                     )}
-                    <div className={`max-w-[70%] p-3 rounded-2xl ${message.isUser ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>
+                    <div className={`max-w-[70%] p-3 rounded-2xl ${message.isUser ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
                         {message.text}
                     </div>
                 </div>

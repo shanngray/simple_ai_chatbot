@@ -1,15 +1,20 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
 import os
-from langchain.chat_models import ChatOpenAI
-from langchain.schema import HumanMessage, AIMessage, SystemMessage
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from dotenv import load_dotenv
+import logging
 
 load_dotenv()
 
 app = FastAPI()
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Add CORS middleware
 app.add_middleware(
@@ -39,6 +44,7 @@ class ChatRequest(BaseModel):
 @app.post("/api/chat")
 async def chat_endpoint(request: ChatRequest):
     try:
+        logger.info("Received request: %s", request.json())
         # Convert messages to LangChain format
         langchain_messages = [
             SystemMessage(content="You are a helpful AI assistant."),
@@ -50,7 +56,7 @@ async def chat_endpoint(request: ChatRequest):
                 langchain_messages.append(AIMessage(content=msg.text))
 
         # Generate response using LangChain
-        response = chat(langchain_messages)
+        response = chat.invoke(langchain_messages)
 
         # Create a new Message object for the AI response
         ai_message = Message(
@@ -59,8 +65,10 @@ async def chat_endpoint(request: ChatRequest):
             isUser=False
         )
 
+        logger.info("Sending response: %s", ai_message.json())
         return {"message": ai_message}
     except Exception as e:
+        logger.error("Error processing request: %s", str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

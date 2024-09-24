@@ -9,6 +9,7 @@ const InputBar: React.FC<InputBarProps> = ({ onSendMessage }) => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        console.log("Form submitted with input:", input);
         if (input.trim()) {
             onSendMessage(input);
             setInput('');
